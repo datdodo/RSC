@@ -5,16 +5,28 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function LogIn() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const handleLogin = async () => {
-        await axios.post("http://localhost:5173/", {username, password})
-            .then(response => {
-                console.log("response", response);
-            })
-            .catch(error => {
-                console.log("error", error);
-            });
+     const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
+
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Prevent the default form submission
+
+        try {
+            const response = await axios.post<{ error?: string }>(
+                "http://localhost/login_php/login.php", 
+                { username, password }
+            );
+
+            if (response.data.error) {
+                setMessage(response.data.error);
+            } else {
+                // Login successful, redirect to dashboard
+                window.location.href = "/"; // Change this to your actual URL
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setMessage("An error occurred while logging in.");
     }
     return (
         <>
